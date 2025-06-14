@@ -7,10 +7,99 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="center-container">
-        <input type="text" placeholder="Type here..." />
-        <button class="toggle-btn" id="toggleMode">Toggle Dark Mode</button>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="logo">RAG-WebApp</h1>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="content-container">
+            <div class="welcome-section">
+                <h2 class="welcome-title">How can I help you today?</h2>
+                <p class="welcome-subtitle">Ask me anything or try one of these suggestions</p>
+            </div>
+
+            <!-- Suggestion Cards -->
+            <div class="suggestions-grid">
+                <div class="suggestion-card">
+                    <div class="suggestion-icon">💡</div>
+                    <div class="suggestion-text">
+                        <h3>Get creative ideas</h3>
+                        <p>Help with brainstorming and problem-solving</p>
+                    </div>
+                </div>
+                <div class="suggestion-card">
+                    <div class="suggestion-icon">📝</div>
+                    <div class="suggestion-text">
+                        <h3>Write and edit</h3>
+                        <p>Craft content, emails, and documents</p>
+                    </div>
+                </div>
+                <div class="suggestion-card">
+                    <div class="suggestion-icon">🔍</div>
+                    <div class="suggestion-text">
+                        <h3>Research topics</h3>
+                        <p>Find information and get explanations</p>
+                    </div>
+                </div>
+                <div class="suggestion-card">
+                    <div class="suggestion-icon">💬</div>
+                    <div class="suggestion-text">
+                        <h3>Have a conversation</h3>
+                        <p>Chat about anything that interests you</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Input Area -->
+    <div class="input-container">
+        <div class="input-wrapper">
+            <div class="input-area">
+                <textarea 
+                    class="chat-input" 
+                    placeholder="Ask me anything..." 
+                    rows="1"
+                    id="chatInput"
+                    aria-label="Chat input"
+                ></textarea>
+                <button class="send-button" id="sendButton" aria-label="Send message">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-footer">
+                <p class="input-disclaimer">AI can make mistakes. Check important info.</p>
+            </div>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <script src="app.js"></script>
 </body>
 </html>
