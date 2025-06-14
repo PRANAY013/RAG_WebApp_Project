@@ -1,0 +1,104 @@
+/* CSS Variables for Pastel Light and Dark Themes */
+:root {
+  --primary-bg: linear-gradient(135deg, #fff0f6 0%, #f3e7ff 100%);
+  --primary-accent: #7b8fff;
+  --secondary-accent: #c084fc;
+  --input-bg: rgba(255,255,255,0.95);
+  --input-text: #2d2d2d;
+  --border-radius: 1.2rem;
+  --shadow: 0 2px 24px 0 rgba(120, 80, 200, 0.10);
+  --container-bg: rgba(255,255,255,0.7);
+  --btn-bg: linear-gradient(90deg, #7b8fff 0%, #c084fc 100%);
+  --btn-text: #fff;
+  --btn-shadow: 0 2px 12px 0 rgba(123,143,255,0.12);
+}
+
+body.dark-mode {
+  --primary-bg: linear-gradient(135deg, #23272f 0%, #181a20 100%);
+  --primary-accent: #ffd700;
+  --secondary-accent: #ffb300;
+  --input-bg: rgba(40,40,48,0.95);
+  --input-text: #f8f8f8;
+  --container-bg: rgba(30,30,38,0.85);
+  --btn-bg: linear-gradient(90deg, #ffd700 0%, #ffb300 100%);
+  --btn-text: #23272f;
+  --btn-shadow: 0 2px 12px 0 rgba(255,215,0,0.10);
+}
+
+body {
+  background: var(--primary-bg);
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.5s;
+  overflow: hidden;
+}
+
+.center-container {
+  background: var(--container-bg);
+  padding: 2.5rem 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+  max-width: 90vw;
+  overflow: auto;
+  border: 2px solid var(--primary-accent);
+  backdrop-filter: blur(8px) saturate(1.2);
+}
+
+input[type="text"] {
+  width: 100%;
+  max-width: 350px;
+  padding: 1rem;
+  border: 2px solid var(--secondary-accent);
+  border-radius: var(--border-radius);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 1.1rem;
+  box-shadow: 0 1px 8px 0 rgba(0,0,0,0.07);
+  outline: none;
+  margin-bottom: 1.5rem;
+  transition: background 0.4s, color 0.4s, border 0.3s;
+  font-weight: 500;
+}
+
+input[type="text"]:focus {
+  border: 2px solid var(--primary-accent);
+  box-shadow: 0 0 0 2px var(--secondary-accent);
+}
+
+.toggle-btn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--btn-shadow);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: background 0.4s, color 0.4s, box-shadow 0.3s;
+  outline: none;
+}
+
+.toggle-btn:active {
+  filter: brightness(0.97);
+  box-shadow: 0 1px 4px 0 var(--primary-accent);
+}
+
+@media (max-width: 500px) {
+  .center-container {
+    padding: 1.2rem 0.5rem;
+    min-width: unset;
+  }
+  input[type="text"] {
+    font-size: 1rem;
+  }
+}

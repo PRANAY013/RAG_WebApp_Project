@@ -1,0 +1,22 @@
+AI-Driven Personalized Web Platform with RAG
+Technologies: React, Node, Express, MongoDB, Python, FastAPI, LangChain, NLP-Transformers
+– Built a scalable MERN WebApp integrating an AI chatbot leveraging RAG for document processing, con-
+textual insights and an adaptive recommendation engine.
+– Optimized application using vector retrieval, semantic embeddings, and transformers for intelligent responses.
+
+- - - - - 
+
+something to refer :
+https://www.linkedin.com/posts/akshay-pachaar_finally-a-rag-solution-that-works-with-complex-activity-7261722485828562945-REhS?utm_source=share&utm_medium=member_desktop&rcm=ACoAADECh0oBC21W1Ga1f7klCE_ebvGlJngvnjw
+
+- - - - - 
+
+to do :
+
+- find someplace to steal the front end ui - dont waste time on this shit 
+- try to go through thte tech stack and --- actually fuck it --- we ball
+
+--- website mods :
+1. make the ui bearable  - make a header navbary that has the website name and the toggle dark/light mode button
+2. make the test input like microsoft copilot ... and overall look 
+https://copilot.microsoft.com/chats/hE9NMHusx4UsKjrg2nzGa
