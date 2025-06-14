@@ -1015,7 +1015,7 @@ body {
 }
 
 .input-area:focus-within {
-  border-color: var(--input-focus);
+  border-color: #ff6b08;
   box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
 }
 
@@ -1035,7 +1035,7 @@ body {
 }
 
 .chat-input::placeholder {
-  color: var(--input-placeholder);
+  color: linear-gradient(to right, #f32170, #ff6b08, #eedd44);
 }
 
 .send-button {
