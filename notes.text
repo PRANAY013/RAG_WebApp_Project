@@ -4,12 +4,13 @@ Technologies: React, Node, Express, MongoDB, Python, FastAPI, LangChain, NLP-Tra
 textual insights and an adaptive recommendation engine.
 – Optimized application using vector retrieval, semantic embeddings, and transformers for intelligent responses.
 
-- - - - - 
+- - - - - - - - - - - - - - - 
 
 something to refer :
 https://www.linkedin.com/posts/akshay-pachaar_finally-a-rag-solution-that-works-with-complex-activity-7261722485828562945-REhS?utm_source=share&utm_medium=member_desktop&rcm=ACoAADECh0oBC21W1Ga1f7klCE_ebvGlJngvnjw
 
-- - - - - 
+- - - - - - - - - - - - - - - 
+
 
 to do :
 
@@ -24,15 +25,32 @@ https://copilot.microsoft.com/chats/hE9NMHusx4UsKjrg2nzGa
 done till here... 
 now use the desired themes with specified colors and then add light and dark mode... 
 
+
+- - - - - - - - - - - - - - - 
+
+
 to do ---  
 mongo ... history ... user auth ... google ... easy login ...
 
+Conversation history sidebar ... left to right 
+we’ll doo the later on as we take someone in … and tell him to prove himself … ( devious idea )
+css theme... for sidebar too 
+
+
 rishik : 
 title dissappear - fix 
-auth search
+make the theme-toggle bg-highlight animation smooth --- along with bottoom section 
+add the user(person svg) icon next-to te theme toggle 
 
-- - - - - - - - - 
-perplexity initial answer
+
+pranay :
+auth search
+mongo search 
+
+
+- - - - - - - - - - - - - - - 
+
+perplexity initial answer (keep this minimized - history purpose)
 
     # Microsoft Copilot-Inspired Web Application Transformation
 
@@ -121,4 +139,5 @@ perplexity initial answer
     [37] - CopilotKit https://docs.copilotkit.ai/reference/components/CopilotChat
     [38] Microsoft Design https://microsoft.design
     [39] Enhancing User Text Input with Copilot in Power Apps - Inogic https://www.inogic.com/blog/2025/03/enhancing-user-text-input-with-copilot-in-power-apps/
-- - - - - - - - - 
+
+- - - - - - - - - - - - - - - 
