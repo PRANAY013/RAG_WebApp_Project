@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,16 +6,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAG-WebApp</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="google-auth-styles.css">
     <link rel="icon" href="RagAiImgIcon.webp">
+    
+    <!-- Add these meta tags for Google Auth -->
+    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
+    <meta name="google-signin-scope" content="profile email">
+    
+    <!-- Google Identity Services Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+    <!-- Google One Tap Container -->
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false"
+         data-cancel_on_tap_outside="true">
+    </div>
+
     <!-- Header Navigation -->
     <header class="header">
         <div class="header-content">
             <div class="header-left">
-                <h1 class="logo">RAG-WebApp</h1> <!-- RAG-BOTowski-->
+                <h1 class="logo">RAG-WebApp</h1>
             </div>
             <div class="header-right">
+                <!-- User Profile Container - NEW -->
+                <div class="user-profile-container" id="userProfileContainer">
+                    <button class="user-profile-button" id="userProfileButton" aria-label="User profile">
+                        <!-- Default user icon when not signed in -->
+                        <svg class="user-icon" id="userIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <!-- User avatar image (hidden by default) -->
+                        <img class="user-avatar" id="userAvatar" alt="User Avatar" style="display: none;">
+                        <!-- User initials fallback (hidden by default) -->
+                        <div class="user-initials" id="userInitials" style="display: none;"></div>
+                    </button>
+                    
+                    <!-- User Profile Dropdown Menu -->
+                    <div class="user-dropdown" id="userDropdown">
+                        <!-- Not signed in state -->
+                        <div class="dropdown-section" id="signedOutSection">
+                            <div class="dropdown-header">
+                                <h3>Sign in to RAG-WebApp</h3>
+                                <p>Access your personalized experience</p>
+                            </div>
+                            <div class="sign-in-options">
+                                <div id="googleSignInButton"></div>
+                                <button class="alternative-signin-btn" id="alternativeSignIn">
+                                    Other sign-in options
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Signed in state -->
+                        <div class="dropdown-section" id="signedInSection" style="display: none;">
+                            <div class="user-info">
+                                <div class="user-avatar-large">
+                                    <img id="dropdownUserAvatar" alt="User Avatar">
+                                    <div id="dropdownUserInitials" class="user-initials-large"></div>
+                                </div>
+                                <div class="user-details">
+                                    <h3 id="userName">User Name</h3>
+                                    <p id="userEmail">user@example.com</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button class="dropdown-action-btn" id="profileSettings">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M12 1v6m0 10v6m11-7h-6m-10 0H1m15.71-6.71l-4.24-4.24m-5.66 5.66L2.29 9.29m15.42 5.42l-4.24 4.24m-5.66-5.66L2.29 14.71"></path>
+                                    </svg>
+                                    Profile Settings
+                                </button>
+                                <button class="dropdown-action-btn" id="preferences">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                    </svg>
+                                    Preferences
+                                </button>
+                                <hr class="dropdown-divider">
+                                <button class="dropdown-action-btn sign-out-btn" id="signOutButton">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16,17 21,12 16,7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Theme Toggle Button -->
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
                     <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -39,7 +130,7 @@
     <main class="main-content">
         <div class="content-container">
             <div class="welcome-section">
-                <h2 class="welcome-title loader-container " style="font-size: 54px;">
+                <h2 class="welcome-title loader-container" style="font-size: 54px;">
                     <svg viewBox="0 0 750 100" width="100%" height="100%">
                     <defs>
                         <linearGradient id="strokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -67,28 +158,28 @@
             <!-- Suggestion Cards -->
             <div class="suggestions-grid">
                 <div class="suggestion-card">
-                    <div class="suggestion-icon">💡</div>
+                    <div class="suggestion-icon">ðŸ’¡</div>
                     <div class="suggestion-text">
                         <h3>Get creative ideas</h3>
                         <p>Help with brainstorming and problem-solving</p>
                     </div>
                 </div>
                 <div class="suggestion-card">
-                    <div class="suggestion-icon">📝</div>
+                    <div class="suggestion-icon">ðŸ“</div>
                     <div class="suggestion-text">
                         <h3>Write and edit</h3>
                         <p>Craft content, emails, and documents</p>
                     </div>
                 </div>
                 <div class="suggestion-card">
-                    <div class="suggestion-icon">🔍</div>
+                    <div class="suggestion-icon">ðŸ”</div>
                     <div class="suggestion-text">
                         <h3>Research topics</h3>
                         <p>Find information and get explanations</p>
                     </div>
                 </div>
                 <div class="suggestion-card">
-                    <div class="suggestion-icon">💬</div>
+                    <div class="suggestion-icon">ðŸ’¬</div>
                     <div class="suggestion-text">
                         <h3>Have a conversation</h3>
                         <p>Chat about anything that interests you</p>
@@ -122,6 +213,50 @@
         </div>
     </div>
 
+    <!-- Loading the scripts -->
+    <script src="google-auth-module.js"></script>
     <script src="app.js"></script>
+    
+    <!-- Initialize Google Auth -->
+    <script>
+        // Initialize Google Authentication
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof GoogleAuthManager !== 'undefined') {
+                window.authManager = new GoogleAuthManager({
+                    clientId: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+                    onSignIn: (user) => {
+                        console.log('User signed in:', user);
+                        // Add your custom sign-in logic here
+                    },
+                    onSignOut: () => {
+                        console.log('User signed out');
+                        // Add your custom sign-out logic here
+                    },
+                    onError: (error) => {
+                        console.error('Auth error:', error);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
+
+<!--
+
+## Key Changes Made:
+
+1. **Added Google Identity Services library** and meta tags
+2. **Added user profile container** next to the theme toggle
+3. **Included Google One Tap setup** with proper configuration
+4. **Added comprehensive dropdown menu** with both signed-in and signed-out states
+5. **Included necessary script references** for the authentication module
+6. **Added proper initialization script** for the Google Auth system
+
+## Next Steps:
+
+1. Replace `YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com` with your actual Google Client ID
+2. Add the CSS file (`google-auth-styles.css`) 
+3. Add the JavaScript module (`google-auth-module.js`)
+4. Update your existing `app.js` to work with the authentication system
+-->

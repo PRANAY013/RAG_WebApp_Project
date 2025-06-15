@@ -38,15 +38,16 @@ css theme... for sidebar too
 
 
 rishik : 
-title dissappear - fix 
-make the theme-toggle bg-highlight animation smooth --- along with bottoom section 
-add the user(person svg) icon next-to te theme toggle 
+title dissappear - IGNORE 
+THEME_SIDEBAR : make the theme-toggle bg-highlight animation smooth --- along with bottoom section 
+LOGIN_ICON : add the user(person svg) icon next-to te theme toggle 
 
 
 pranay :
 auth search
 mongo search 
 
+remove redundant
 
 - - - - - - - - - - - - - - - 
 
