@@ -1040,3 +1040,55 @@ chatItems.forEach(item => {
     this.classList.add('active');
   });
 });
+
+
+
+
+
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const headerLeft = document.getElementById('headerLeft');
+const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+const mainLayout = document.getElementById('mainWrapper');
+
+// Set your default sidebar width here
+const SIDEBAR_WIDTH = '280px';
+
+function showSidebar() {
+  sidebar.classList.remove('sidebar--hidden');
+  sidebarOverlay.classList.remove('hidden');
+  mainLayout.style.setProperty('--sidebar-width', SIDEBAR_WIDTH);
+  // Hide header-left when sidebar is shown
+  if (headerLeft) headerLeft.classList.add('header-left--hidden');
+}
+
+function hideSidebar() {
+  sidebar.classList.add('sidebar--hidden');
+  sidebarOverlay.classList.add('hidden');
+  mainLayout.style.setProperty('--sidebar-width', '0px');
+  // Show header-left when sidebar is hidden
+  if (headerLeft) headerLeft.classList.remove('header-left--hidden');
+}
+
+
+// Toggle sidebar
+sidebarToggleBtn.addEventListener('click', () => {
+  if (sidebar.classList.contains('sidebar--hidden')) {
+    showSidebar();
+  } else {
+    hideSidebar();
+  }
+});
+
+// Hide sidebar when clicking overlay
+sidebarOverlay.addEventListener('click', hideSidebar);
+
+// Hide sidebar on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hideSidebar();
+});
+
+// Optionally: Hide sidebar by default on mobile
+if (window.innerWidth < 768) {
+  hideSidebar();
+}

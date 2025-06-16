@@ -774,7 +774,6 @@ body {
   top: 0;
   z-index: 100;
   background: transparent;
-  backdrop-filter: blur(20px);
   transition: all 0.3s ease;
 }
 
@@ -857,6 +856,9 @@ body {
 
 /* Main content */
 .main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
   flex: 1;
   display: flex;
   align-items: center;
@@ -1002,6 +1004,7 @@ body {
   background: transparent;
   padding: var(--space-20) var(--space-16);
   z-index: 50;
+  transition :all 0.3s ease-in-out;
 }
 
 .input-wrapper {
@@ -1017,7 +1020,6 @@ body {
   padding: var(--space-12) var(--space-16);
   padding-right: 56px;
   box-shadow: var(--copilot-shadow);
-  transition: all 0.2s ease;
 }
 
 .input-area:focus-within {
@@ -1096,18 +1098,11 @@ body {
     margin-left:0;
     transition: all 0.25s linear;
   }
-  .logo-small {
-    visibility: visible;
-    transition: visibility 0.25s ease-in-out;
-  }
 }
 @media (min-width: 992px) {
   .input-container {
     padding: var(--space-20) var(--space-16);
     margin-left: var(--sidebar-width);
-  }
-  .logo-small {
-    visibility: hidden;
   }
 }
 
@@ -1126,6 +1121,9 @@ body {
   }
   
   .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
     justify-content: center;
     align-items: center;
     padding: var(--space-24) var(--space-12);
@@ -1876,9 +1874,8 @@ select.form-control {
    ==================================== */
 
 .header {
+  width: 100%;
   background: transparent;;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   transition: all var(--duration-normal) var(--ease-standard);
 }
 
@@ -4036,5 +4033,211 @@ body.sidebar-open {
   transform: rotate(0deg) scale(1);
 }
 
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: transparent;
+  border-radius: 35%;
+  color: var(--copilot-text-secondary);
+  cursor: pointer;
+  transition: all 1s ease-in-out;
+  position: relative;
+  margin-right: 8px; /* optional, for spacing */
+}
+
+.sidebar-toggle:hover {
+  background: linear-gradient(to right, #f32170, #ff6b08, #eedd44);
+  color: var(--copilot-text);
+  transition: all 0.125s ease-in-out;
+}
+
+.sidebar-toggle:focus-visible {
+  outline: 2px solid var(--copilot-primary);
+  outline-offset: 2px;
+  transform: scale(1.125);
+  transition: all 1s ease-in-out;
+}
+
+.sidebar-toggle:active {
+  transform: scale(0.95);
+  transition: all 0.2s ease-out;
+}
+
+.sidebar-toggle-icon {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  transition: all 1s ease-in-out;
+}
+
+
+/* Sidebar sliding animation */
+.sidebar {
+  transition: transform 0.5s cubic-bezier(.77,0,.18,1), opacity 0.25s;
+  transform: translateX(0);
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+.sidebar--hidden {
+  transition: transform 0.5s cubic-bezier(.77,0,.18,1), opacity 0.25s;
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Optional: Overlay fade for mobile */
+.sidebar-overlay {
+  transition: opacity 0.25s;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.main-wrapper {
+  --sidebar-width: 280px; /* default width */
+  display: flex;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  /* ... */
+}
+
+.content {
+  width: calc(100% - var(--sidebar-width));
+  /* ... */
+}
+
+.sidebar,
+.sidebar-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+  margin-right: 0 !important;
+}
+
 
 /* ===== END SIDEBAR STYLES ===== */
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.layout {
+  display: flex;
+  flex-direction: column;
+}
+.main-wrapper {
+  --sidebar-width: 280px; /* default width */
+  display: flex;
+}
+.main-content {
+  flex: 1;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+
+
+:root {
+  --sidebar-width: 280px; /* default */
+}
+
+.main-wrapper {
+  display: flex;
+  min-height: 95vh;
+}
+
+.sidebar {
+  width: var(--sidebar-width, 280px);
+  max-width: 90vw;
+  min-width: 0;
+  background: var(--sidebar-bg, #fff);
+  box-shadow: var(--sidebar-shadow, 2px 0 8px rgba(0,0,0,0.07));
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  transition:
+    transform 0.35s cubic-bezier(.77,0,.18,1),
+    opacity 0.25s cubic-bezier(.77,0,.18,1),
+    width 0.35s cubic-bezier(.77,0,.18,1);
+  transform: translateX(0);
+  opacity: 1;
+  will-change: transform, opacity, width;
+}
+
+.sidebar--hidden {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.main-content {
+  flex: 1 1 0%;
+  min-width: 0;
+  transition: margin-left 0.3s cubic-bezier(.77,0,.18,1);
+}
+
+
+.header-left {
+  display: flex; /* or block, as needed for your layout */
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.header-left--hidden {
+  visibility: hidden !important;
+}
+
+.logo-small {
+  margin : 10px 0 10px 0 ;
+  transition: all 0.125s ease-in-out;
+}
+
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-wrapper {
+  flex: 1 1 0%;
+  display: flex;
+  min-height: 0;
+}
+
+.sidebar {
+  /* your sidebar styles */
+}
+
+.main-content {
+  flex: 1 1 0%;
+  min-height: 0;
+  /* If you want to center content vertically: */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
