@@ -6,8 +6,8 @@
   --color-text: rgba(19, 52, 59, 1);
   --color-text-secondary: rgba(98, 108, 113, 1);
   --color-primary: rgba(33, 128, 141, 1);
-  --color-primary-hover: rgba(29, 116, 128, 1);
-  --color-primary-active: rgba(26, 104, 115, 1);
+  --color-primary-hover: #ff6b08;
+  --color-primary-active: #ff6b08;
   --color-secondary: rgba(94, 82, 64, 0.12);
   --color-secondary-hover: rgba(94, 82, 64, 0.2);
   --color-secondary-active: rgba(94, 82, 64, 0.25);
@@ -1897,8 +1897,8 @@ select.form-control {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: var(--radius-full); /* Updated for full roundness like theme-toggle */
-  background: transparent;           /* Start transparent, like theme-toggle */
+  background: transparent;
+  border-radius: var(--radius-full);
   color: var(--copilot-text-secondary); /* Match theme-toggle text color */
   cursor: pointer;
   transition: all 1s ease-in-out;    /* Slow, smooth transition like theme-toggle */
@@ -2431,9 +2431,9 @@ select.form-control {
   --color-surface: rgba(255, 255, 253, 1);
   --color-text: rgba(19, 52, 59, 1);
   --color-text-secondary: rgba(98, 108, 113, 1);
-  --color-primary: rgba(33, 128, 141, 1);
-  --color-primary-hover: rgba(29, 116, 128, 1);
-  --color-primary-active: rgba(26, 104, 115, 1);
+  --color-primary: #ff6b08;
+  --color-primary-hover: #ff6b08;
+  --color-primary-active: #ff6b08;
   --color-secondary: rgba(94, 82, 64, 0.12);
   --color-secondary-hover: rgba(94, 82, 64, 0.2);
   --color-secondary-active: rgba(94, 82, 64, 0.25);
@@ -2442,7 +2442,7 @@ select.form-control {
   --color-card-border: rgba(94, 82, 64, 0.12);
   --color-card-border-inner: rgba(94, 82, 64, 0.12);
   --color-error: rgba(192, 21, 47, 1);
-  --color-success: rgba(33, 128, 141, 1);
+  --color-success: #ff6b08;
   --color-warning: rgba(168, 75, 47, 1);
   --color-info: rgba(98, 108, 113, 1);
   --color-focus-ring: rgba(33, 128, 141, 0.4);
@@ -2618,8 +2618,8 @@ select.form-control {
   --color-text: rgba(19, 52, 59, 1);
   --color-text-secondary: rgba(98, 108, 113, 1);
   --color-primary: rgba(33, 128, 141, 1);
-  --color-primary-hover: rgba(29, 116, 128, 1);
-  --color-primary-active: rgba(26, 104, 115, 1);
+  --color-primary-hover: #ff6b08;
+  --color-primary-active: #ff6b08;
   --color-secondary: rgba(94, 82, 64, 0.12);
   --color-secondary-hover: rgba(94, 82, 64, 0.2);
   --color-secondary-active: rgba(94, 82, 64, 0.25);
@@ -3096,44 +3096,72 @@ select.form-control {
   display: inline-block;
   margin-right: var(--space-8);
 }
-
+/* Updated User Profile Button */
 .user-profile-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border: none;
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background: transparent;
+  border-radius: var(--radius-full);
+  color: var(--copilot-text-secondary);
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-standard);
+  transition: all 1s ease-in-out;
   position: relative;
   overflow: hidden;
 }
 
 .user-profile-button:hover {
-  background-color: var(--color-secondary);
+  transition: all 1s ease-in-out;
+  background: linear-gradient(to right, #f32170, #ff6b08, #eedd44);
+  color: var(--copilot-text);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+}
+
+.user-profile-button:focus-visible {
+  outline: 2px solid var(--copilot-primary);
+  outline-offset: 2px;
+  transition: all 1s ease-in-out;
 }
 
 .user-profile-button:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-xs);
+  transform: scale(0.95) translateY(0);
+  transition: all 0.2s ease-out;
 }
 
-/* User Icon Styles */
+/* User Icon Adjustments */
 .user-icon {
-  width: 20px;
-  height: 20px;
-  stroke: var(--color-text-secondary);
-  transition: stroke var(--duration-fast) var(--ease-standard);
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  transition: all 0.3s ease-in-out;
 }
 
 .user-profile-button:hover .user-icon {
-  stroke: var(--color-text);
+  stroke: var(--copilot-text);
+  transform: scale(1.1);
+}
+
+/* Avatar/Initials styling */
+.user-avatar,
+.user-initials {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.3s ease-in-out;
+}
+
+.user-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--copilot-text);
+  background: var(--color-secondary);
 }
 
 /* User Avatar Styles */
@@ -3503,20 +3531,6 @@ select.form-control {
   }
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .user-profile-button {
-    border: 2px solid var(--color-text);
-  }
-  
-  .dropdown-action-btn {
-    border: 1px solid transparent;
-  }
-  
-  .dropdown-action-btn:hover {
-    border-color: var(--color-text);
-  }
-}
 
 /* Print Styles */
 @media print {
@@ -3938,5 +3952,89 @@ body.sidebar-open {
     transition: all 0.5s ease-in-out !important;
   }
 }
+
+/* Remove ugly blue outline on click/focus */
+.suggestion-card:focus {
+  outline: none;
+  box-shadow: none;
+}
+/* Scale animation on click */
+.suggestion-card:active {
+  animation: suggestionScale 0.18s cubic-bezier(.4,1.5,.5,1) ease-in-out;
+}
+
+
+/* --- Theme Toggle & User Profile Button Unified Styles --- */
+.theme-toggle,
+.user-profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 35%;
+  background: transparent;
+
+  color: var(--copilot-text-secondary);
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle:hover,
+.user-profile-button:hover {
+  transition: all 0.125s ease-in-out;
+  background: linear-gradient(to right, #f32170, #ff6b08, #eedd44);
+  color: var(--copilot-text);
+}
+
+.theme-toggle:focus-visible,
+.user-profile-button:focus-visible {
+  transform: scale(1.05);
+  transition: all 1s ease-in-out;
+  outline: 2px solid var(--copilot-primary);
+  outline-offset: 2px;
+}
+
+/* --- Icon Styling --- */
+.theme-icon, {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  transition: all 1s ease-in-out;
+}
+
+/* Optional: Slight icon scale on hover for both */
+.theme-toggle:hover .theme-icon,
+.user-profile-button:hover {
+  transform: scale(1.08);
+  stroke: var(--copilot-text);
+}
+
+
+.sun-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+  color: black;
+}
+
+.moon-icon {
+  opacity: 0;
+  transform: rotate(180deg) scale(0.5);
+}
+
+[data-theme="dark"] .sun-icon {
+  opacity: 0;
+  transform: rotate(-180deg) scale(0.5);
+}
+
+[data-theme="dark"] .moon-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
 
 /* ===== END SIDEBAR STYLES ===== */

@@ -880,7 +880,7 @@ class GoogleAuthManager {
    */
   restoreUserSession() {
     try {
-      const sessionData = localStorage.getItem('google_auth_session');
+      const sessionData = localStorage.getItem('google_r_session');
       if (!sessionData) return;
 
       const parsed = JSON.parse(sessionData);
