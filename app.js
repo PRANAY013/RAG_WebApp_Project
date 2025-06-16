@@ -880,7 +880,7 @@ class GoogleAuthManager {
    */
   restoreUserSession() {
     try {
-      const sessionData = localStorage.getItem('google_auth_session');
+      const sessionData = localStorage.getItem('google_r_session');
       if (!sessionData) return;
 
       const parsed = JSON.parse(sessionData);
@@ -1014,4 +1014,81 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = GoogleAuthManager;
 } else if (typeof window !== 'undefined') {
   window.GoogleAuthManager = GoogleAuthManager;
+}
+
+// new chat button clears the existing input
+document.addEventListener('DOMContentLoaded', function() {
+    const newChatBtn = document.getElementById('newChatBtn');
+    const chatInput = document.getElementById('chatInput');
+
+    newChatBtn.addEventListener('click', function() {
+        chatInput.value = '';
+        // Optionally, focus the input after clearing
+        chatInput.focus();
+    });
+});
+
+
+// Select all chat items
+const chatItems = document.querySelectorAll('.chat-item');
+
+chatItems.forEach(item => {
+  item.addEventListener('click', function() {
+    // Remove 'active' from currently active item
+    document.querySelector('.chat-item.active')?.classList.remove('active');
+    // Add 'active' to the clicked item
+    this.classList.add('active');
+  });
+});
+
+
+
+
+
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const headerLeft = document.getElementById('headerLeft');
+const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+const mainLayout = document.getElementById('mainWrapper');
+
+// Set your default sidebar width here
+const SIDEBAR_WIDTH = '280px';
+
+function showSidebar() {
+  sidebar.classList.remove('sidebar--hidden');
+  sidebarOverlay.classList.remove('hidden');
+  mainLayout.style.setProperty('--sidebar-width', SIDEBAR_WIDTH);
+  // Hide header-left when sidebar is shown
+  if (headerLeft) headerLeft.classList.add('header-left--hidden');
+}
+
+function hideSidebar() {
+  sidebar.classList.add('sidebar--hidden');
+  sidebarOverlay.classList.add('hidden');
+  mainLayout.style.setProperty('--sidebar-width', '0px');
+  // Show header-left when sidebar is hidden
+  if (headerLeft) headerLeft.classList.remove('header-left--hidden');
+}
+
+
+// Toggle sidebar
+sidebarToggleBtn.addEventListener('click', () => {
+  if (sidebar.classList.contains('sidebar--hidden')) {
+    showSidebar();
+  } else {
+    hideSidebar();
+  }
+});
+
+// Hide sidebar when clicking overlay
+sidebarOverlay.addEventListener('click', hideSidebar);
+
+// Hide sidebar on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hideSidebar();
+});
+
+// Optionally: Hide sidebar by default on mobile
+if (window.innerWidth < 768) {
+  hideSidebar();
 }
