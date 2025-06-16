@@ -1015,3 +1015,14 @@ if (typeof module !== 'undefined' && module.exports) {
 } else if (typeof window !== 'undefined') {
   window.GoogleAuthManager = GoogleAuthManager;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const newChatBtn = document.getElementById('newChatBtn');
+    const chatInput = document.getElementById('chatInput');
+
+    newChatBtn.addEventListener('click', function() {
+        chatInput.value = '';
+        // Optionally, focus the input after clearing
+        chatInput.focus();
+    });
+});
