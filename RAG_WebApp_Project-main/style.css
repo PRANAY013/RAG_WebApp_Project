@@ -1890,12 +1890,6 @@ select.form-control {
 /* ====================================
    Enhanced User Profile Styles
    ==================================== */
-
-.user-profile-container {
-  position: relative;
-  display: inline-block;
-}
-
 .user-profile-button {
   display: flex;
   align-items: center;
@@ -1903,49 +1897,56 @@ select.form-control {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: var(--radius-base);
-  background: var(--color-secondary);
-  color: var(--color-text);
+  border-radius: var(--radius-full); /* Updated for full roundness like theme-toggle */
+  background: transparent;           /* Start transparent, like theme-toggle */
+  color: var(--copilot-text-secondary); /* Match theme-toggle text color */
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-standard);
+  transition: all 1s ease-in-out;    /* Slow, smooth transition like theme-toggle */
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
 
 .user-profile-button:hover {
-  background: var(--color-secondary-hover);
-  transform: translateY(-1px);
+  transition: all 0.125s ease-in-out; /* Fast transition on hover */
+  background: linear-gradient(to right, #f32170, #ff6b08, #eedd44); /* Gradient like theme-toggle */
+  color: var(--copilot-text);
+  transform: none; /* Remove translateY for consistency with theme-toggle */
   box-shadow: var(--shadow-md);
 }
 
-.user-profile-button:active {
-  transform: translateY(0);
-  background: var(--color-secondary-active);
-  box-shadow: var(--shadow-sm);
-}
-
-.user-profile-button:focus {
+.user-profile-button:focus-visible {
+  transform: scale(1.05);            /* Slight scale on focus, like theme-toggle */
+  transition: all 1s ease-in-out;
   outline: none;
   box-shadow: var(--focus-ring);
 }
 
-/* User States */
+.user-profile-button:active {
+  transform: scale(1);               /* Reset scale on active */
+  background: linear-gradient(to right, #f32170, #ff6b08, #eedd44); /* Keep gradient on active */
+  box-shadow: var(--shadow-sm);
+}
+
+/* User Icon Animation */
 .user-icon {
   width: 20px;
   height: 20px;
   stroke: var(--color-text-secondary);
-  transition: stroke var(--duration-fast) var(--ease-standard);
+  transition: all 1s ease-in-out;    /* Animate all, not just stroke */
+  position: absolute;                /* Like .theme-icon */
 }
 
 .user-profile-button:hover .user-icon {
-  stroke: var(--color-text);
+  stroke: var(--copilot-text);
+  /* Optionally, animate background for icon if desired */
 }
 
+/* Avatar and Initials remain unchanged */
 .user-avatar {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-base);
+  border-radius: var(--radius-full); /* Match the button's roundness */
   object-fit: cover;
   border: 2px solid var(--color-border);
 }
@@ -1956,7 +1957,7 @@ select.form-control {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-base);
+  border-radius: var(--radius-full); /* Match the button's roundness */
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: var(--color-btn-primary-text);
   font-size: var(--font-size-sm);
