@@ -1016,6 +1016,7 @@ if (typeof module !== 'undefined' && module.exports) {
   window.GoogleAuthManager = GoogleAuthManager;
 }
 
+// new chat button clears the existing input
 document.addEventListener('DOMContentLoaded', function() {
     const newChatBtn = document.getElementById('newChatBtn');
     const chatInput = document.getElementById('chatInput');
@@ -1025,4 +1026,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Optionally, focus the input after clearing
         chatInput.focus();
     });
+});
+
+
+// Select all chat items
+const chatItems = document.querySelectorAll('.chat-item');
+
+chatItems.forEach(item => {
+  item.addEventListener('click', function() {
+    // Remove 'active' from currently active item
+    document.querySelector('.chat-item.active')?.classList.remove('active');
+    // Add 'active' to the clicked item
+    this.classList.add('active');
+  });
 });
