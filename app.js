@@ -468,7 +468,9 @@ class GoogleAuthManager {
       signOutButton: document.getElementById('signOutButton'),
       profileSettings: document.getElementById('profileSettings'),
       preferences: document.getElementById('preferences'),
-      alternativeSignIn: document.getElementById('alternativeSignIn')
+      alternativeSignIn: document.getElementById('alternativeSignIn'),
+      sidebarUserName: document.querySelector('.sidebar-footer .user-name'),
+      sidebarUserEmail: document.querySelector('.sidebar-footer .user-email')
     };
   }
 
@@ -793,6 +795,14 @@ class GoogleAuthManager {
     }
     if (this.elements.userEmail) {
       this.elements.userEmail.textContent = user.email || '';
+    }
+
+    // Update sidebar content
+    if (this.elements.sidebarUserName) {
+      this.elements.sidebarUserName.textContent = user.name || 'User';
+    }
+    if (this.elements.sidebarUserEmail) {
+      this.elements.sidebarUserEmail.textContent = user.email || 'user@example.com';
     }
 
     // Update dropdown avatar
