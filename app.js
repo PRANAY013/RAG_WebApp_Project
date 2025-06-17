@@ -566,7 +566,7 @@ class GoogleAuthManager {
 
     // Initialize the Google Identity Services
     google.accounts.id.initialize({
-      client_id: this.config.clientId,
+      client_id: '840850164307-m4lks13qq8ffu6sadbhu05233upog1ni.apps.googleusercontent.com',
       callback: this.handleCredentialResponse.bind(this),
       auto_select: false,
       cancel_on_tap_outside: true,
