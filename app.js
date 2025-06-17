@@ -2,9 +2,11 @@
 
 class CopilotApp {
     constructor() {
-        this.currentTheme = 'light';
-        this.init();
+      this.currentTheme = 'light';
+      this.sessionId = this.generateSessionId(); 
+      this.init();
     }
+
 
     init() {
         this.setupThemeToggle();
@@ -12,6 +14,11 @@ class CopilotApp {
         this.setupSuggestionCards();
         this.setupSendButton();
         this.detectSystemTheme();
+    }
+
+    // method to generate unique session IDs
+    generateSessionId() {
+      return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     // Theme Management
@@ -136,36 +143,49 @@ class CopilotApp {
             });
         }
     }
+  async handleSendMessage() {
+      const chatInput = document.getElementById('chatInput');
+      const sendButton = document.getElementById('sendButton');
+      
+      if (chatInput && sendButton) {
+          const message = chatInput.value.trim();
+          
+          if (message.length > 0) {
+              // Check authentication before sending
+              if (!mongoAPI.isAuthenticated()) {
+                  this.showError('Please sign in to send messages');
+                  return;
+              }
 
-    handleSendMessage() {
-        const chatInput = document.getElementById('chatInput');
-        const sendButton = document.getElementById('sendButton');
-        
-        if (chatInput && sendButton) {
-            const message = chatInput.value.trim();
-            
-            if (message.length > 0) {
-                // Add loading state
-                sendButton.classList.add('loading');
-                sendButton.style.pointerEvents = 'none';
-                
-                // Simulate sending (replace with actual API call)
-                setTimeout(() => {
-                    console.log('Message sent:', message);
-                    chatInput.value = '';
-                    this.autoResizeTextarea(chatInput);
-                    this.updateSendButtonState();
-                    
-                    // Remove loading state
-                    sendButton.classList.remove('loading');
-                    sendButton.style.pointerEvents = 'auto';
-                    
-                    // Show a simple response (for demo purposes)
-                    this.showResponseDemo(message);
-                }, 1000);
-            }
-        }
-    }
+              // Add loading state
+              sendButton.classList.add('loading');
+              sendButton.style.pointerEvents = 'none';
+              
+              try {
+                  // Send to MongoDB backend
+                  const savedMessage = await mongoAPI.sendMessage(message, this.sessionId);
+                  
+                  // Clear input and update UI
+                  chatInput.value = '';
+                  this.autoResizeTextarea(chatInput);
+                  this.updateSendButtonState();
+                  
+                  // Show success message
+                  this.showSuccess(`Message saved! ID: ${savedMessage._id.substring(0, 8)}...`);
+                  
+                  // Show demo response for user feedback
+                  this.showResponseDemo(message);
+                  
+              } catch (error) {
+                  this.showError('Failed to send message: ' + error.message);
+              } finally {
+                  // Remove loading state
+                  sendButton.classList.remove('loading');
+                  sendButton.style.pointerEvents = 'auto';
+              }
+          }
+      }
+  }
 
     showResponseDemo(userMessage) {
         // Create a simple response indicator
@@ -282,6 +302,56 @@ class CopilotApp {
             timeout = setTimeout(later, wait);
         };
     }
+
+    // Add these methods to your CopilotApp class
+showError(message) {
+    this.showNotification(message, 'error');
+}
+
+showSuccess(message) {
+    this.showNotification(message, 'success');
+}
+
+showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : '#4444ff'};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-size: 14px;
+        max-width: 300px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    `;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateY(0)';
+    }, 100);
+    
+    // Remove after 4 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
+}
+
 }
 
 // Smooth scroll behavior for suggestion cards
@@ -631,48 +701,49 @@ class GoogleAuthManager {
    */
   async handleCredentialResponse(response) {
     try {
-      this.log('Credential response received');
-      
-      // Decode the JWT token
-      const userInfo = this.decodeJWT(response.credential);
-      
-      if (!userInfo) {
-        throw new Error('Invalid credential token');
-      }
+        this.log('Credential response received');
+        
+        // Decode the JWT token
+        const userInfo = this.decodeJWT(response.credential);
+        
+        if (!userInfo) {
+            throw new Error('Invalid credential token');
+        }
 
-      // Create user object
-      const user = {
-        id: userInfo.sub,
-        email: userInfo.email,
-        name: userInfo.name,
-        picture: userInfo.picture,
-        given_name: userInfo.given_name,
-        family_name: userInfo.family_name,
-        email_verified: userInfo.email_verified,
-        token: response.credential
-      };
+        // Authenticate with your MongoDB backend
+        const user = await mongoAPI.authenticateWithGoogle({
+            id: userInfo.sub,
+            email: userInfo.email,
+            name: userInfo.name,
+            picture: userInfo.picture
+        });
 
-      // Store user information
-      this.currentUser = user;
-      
-      // Save to localStorage for session persistence
-      this.saveUserSession(user);
-      
-      // Update UI
-      this.updateUIForSignedIn(user);
-      
-      // Close dropdown
-      this.closeDropdown();
-      
-      // Call custom sign-in callback
-      this.config.onSignIn(user);
-      
-      this.log('User signed in successfully:', user);
-      
+        // Store user information
+        this.currentUser = user;
+        
+        // Save to localStorage for session persistence
+        this.saveUserSession(user);
+        
+        // Update UI
+        this.updateUIForSignedIn(user);
+        
+        // Close dropdown
+        this.closeDropdown();
+        
+        // Call custom sign-in callback
+        this.config.onSignIn(user);
+        
+        // Dispatch custom event for other components
+        document.dispatchEvent(new CustomEvent('userLoggedIn', { 
+            detail: { user: user } 
+        }));
+        
+        this.log('User authenticated with backend:', user);
+        
     } catch (error) {
-      this.handleError('Sign-in failed', error);
+        this.handleError('Authentication failed', error);
     }
-  }
+}
 
   /**
    * Decode JWT token
@@ -890,28 +961,44 @@ class GoogleAuthManager {
    */
   restoreUserSession() {
     try {
-      const sessionData = localStorage.getItem('google_r_session');
-      if (!sessionData) return;
+        // Fix the typo: should be 'google_auth_session' not 'google_r_session'
+        const sessionData = localStorage.getItem('google_auth_session');
+        if (!sessionData) return;
 
-      const parsed = JSON.parse(sessionData);
-      const sessionAge = Date.now() - parsed.timestamp;
-      
-      // Session expires after 24 hours
-      if (sessionAge > 24 * 60 * 60 * 1000) {
-        this.clearUserSession();
-        return;
-      }
+        const parsed = JSON.parse(sessionData);
+        const sessionAge = Date.now() - parsed.timestamp;
+        
+        // Session expires after 24 hours
+        if (sessionAge > 24 * 60 * 60 * 1000) {
+            this.clearUserSession();
+            return;
+        }
 
-      if (parsed.user) {
-        this.currentUser = parsed.user;
-        this.updateUIForSignedIn(parsed.user);
-        this.log('User session restored');
-      }
+        if (parsed.user) {
+            this.currentUser = parsed.user;
+            this.updateUIForSignedIn(parsed.user);
+            
+            // Re-authenticate with backend to get fresh token
+            this.authenticateWithBackend(parsed.user);
+            
+            this.log('User session restored');
+        }
     } catch (error) {
-      this.log('Failed to restore user session:', error);
-      this.clearUserSession();
+        this.log('Failed to restore user session:', error);
+        this.clearUserSession();
     }
-  }
+}
+
+async authenticateWithBackend(user) {
+    try {
+        await mongoAPI.authenticateWithGoogle(user);
+    } catch (error) {
+        this.log('Backend re-authentication failed:', error);
+        // If backend auth fails, clear the session
+        this.clearUserSession();
+        this.updateUIForSignedOut();
+    }
+}
 
   /**
    * Clear user session from localStorage
@@ -1103,12 +1190,153 @@ if (window.innerWidth < 768) {
   hideSidebar();
 }
 
-// Dispatch custom event after successful login
-document.dispatchEvent(new CustomEvent('userLoggedIn', { 
-  detail: { user: userData } 
-}));
-
-// Listen for the event in your sidebar component
-document.addEventListener('userLoggedIn', (event) => {
-  this.updateSidebarUserInfo(event.detail.user);
+// Removed the problematic existing custom event code and replaced with this:
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new CopilotApp();
+    addSmoothInteractions();
+    setupAccessibility();
+    
+    // Initialize Google Auth with MongoDB integration
+    const googleAuth = new GoogleAuthManager({
+        clientId: '840850164307-m4lks13qq8ffu6sadbhu05233upog1ni.apps.googleusercontent.com',
+        debugMode: true,
+        onSignIn: (user) => {
+            console.log('User signed in:', user);
+            // Update any other UI components that need user info
+        },
+        onSignOut: () => {
+            console.log('User signed out');
+            mongoAPI.signOut();
+        },
+        onError: (error) => {
+            console.error('Auth error:', error);
+            app.showError('Authentication failed: ' + error.message);
+        }
+    });
+    
+    // Add loading animation for the page
+    document.body.style.opacity = '0';
+    document.body.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        document.body.style.opacity = '1';
+        document.body.style.transform = 'translateY(0)';
+    }, 100);
 });
+
+
+
+
+// MongoDB API Client - Add this after your existing classes
+class MongoDBChatAPI {
+    constructor() {
+        this.baseURL = 'http://localhost:3001/api';
+        this.token = localStorage.getItem('chat_auth_token');
+        this.currentUser = null;
+    }
+
+    setAuthToken(token) {
+        this.token = token;
+        localStorage.setItem('chat_auth_token', token);
+    }
+
+    isAuthenticated() {
+        return !!this.token;
+    }
+
+    async authenticateWithGoogle(googleUser) {
+        try {
+            const response = await fetch(`${this.baseURL}/auth/google`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    googleId: googleUser.id,
+                    email: googleUser.email,
+                    name: googleUser.name,
+                    picture: googleUser.picture
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                this.setAuthToken(data.token);
+                this.currentUser = data.user;
+                return data.user;
+            } else {
+                throw new Error(data.message || 'Authentication failed');
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            throw error;
+        }
+    }
+
+    async sendMessage(message, sessionId = null) {
+        if (!this.isAuthenticated()) {
+            throw new Error('Not authenticated');
+        }
+
+        try {
+            const response = await fetch(`${this.baseURL}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify({
+                    message,
+                    sessionId
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.message;
+            } else {
+                throw new Error(data.message || 'Failed to send message');
+            }
+        } catch (error) {
+            console.error('Send message error:', error);
+            throw error;
+        }
+    }
+
+    async getMessages() {
+        if (!this.isAuthenticated()) {
+            throw new Error('Not authenticated');
+        }
+
+        try {
+            const response = await fetch(`${this.baseURL}/messages`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.messages;
+            } else {
+                throw new Error(data.message || 'Failed to fetch messages');
+            }
+        } catch (error) {
+            console.error('Fetch messages error:', error);
+            throw error;
+        }
+    }
+
+    signOut() {
+        this.token = null;
+        this.currentUser = null;
+        localStorage.removeItem('chat_auth_token');
+    }
+}
+
+// Initialize the API client
+const mongoAPI = new MongoDBChatAPI();
