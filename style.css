@@ -1984,6 +1984,8 @@ select.form-control {
   overflow: hidden;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  align-items: center;
+  justify-content: center;
 }
 
 .user-dropdown.show {
@@ -3201,6 +3203,8 @@ select.form-control {
   transition: all var(--duration-normal) var(--ease-standard);
   z-index: 1000;
   overflow: hidden;
+  align-items: center;
+  justify-content: center;
 }
 
 .user-dropdown.show {
@@ -3386,7 +3390,7 @@ select.form-control {
 /* Responsive Design */
 @media (max-width: 768px) {
   .user-dropdown {
-    width: 280px;
+    width: 250px;
     left: auto;
     right: 0;
   }
@@ -3407,10 +3411,6 @@ select.form-control {
 }
 
 @media (max-width: 480px) {
-  .user-dropdown {
-    width: calc(100vw - 2rem);
-    right: -1rem;
-  }
   
   .user-profile-button {
     width: 36px;

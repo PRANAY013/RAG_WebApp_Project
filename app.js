@@ -1102,3 +1102,13 @@ document.addEventListener('keydown', (e) => {
 if (window.innerWidth < 768) {
   hideSidebar();
 }
+
+// Dispatch custom event after successful login
+document.dispatchEvent(new CustomEvent('userLoggedIn', { 
+  detail: { user: userData } 
+}));
+
+// Listen for the event in your sidebar component
+document.addEventListener('userLoggedIn', (event) => {
+  this.updateSidebarUserInfo(event.detail.user);
+});
