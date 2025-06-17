@@ -3707,14 +3707,18 @@ body {
 .sidebar-footer {
   display: flex;
   padding: var(--space-8);
-  margin: auto;
   flex-shrink: 0;
+  width: 100%;
+  min-width: 220px;
+  box-sizing: border-box;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: var(--space-12);
+  width: 100%;
+  min-width: 0;
 }
 
 .user-avatar {
@@ -3734,6 +3738,18 @@ body {
 .user-info {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name,
+.user-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .user-name {
@@ -3747,9 +3763,17 @@ body {
   font-size: var(--font-size-xs);
   color: var(--sidebar-text-secondary);
   line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+  .user-profile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-8);
+  }
+  .user-avatar {
+    margin-bottom: var(--space-4);
+  }
 }
 
 /* Sidebar Overlay */
