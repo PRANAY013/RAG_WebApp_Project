@@ -1,10 +1,53 @@
 // Microsoft Copilot-inspired JavaScript functionality
-
+// fetchUserMessages(): add new backend API for fetching messages after deploying on vercel!!
 class CopilotApp {
     constructor() {
-      this.currentTheme = 'light';
-      this.sessionId = this.generateSessionId(); 
-      this.init();
+        this.currentTheme = 'light';
+        this.init();
+    }
+
+    renderSidebar(messages) {
+    // Group messages by date
+      const today = [];
+      const week = [];
+      const month = [];
+      const now = new Date();
+
+      messages.forEach(msg => {
+        const msgDate = new Date(msg.timestamp);
+        const diffDays = (now - msgDate) / (1000 * 60 * 60 * 24);
+        if (diffDays < 1) {
+          today.push(msg);
+        } else if (diffDays < 7) {
+          week.push(msg);
+        } else if (diffDays < 30) {
+          month.push(msg);
+        }
+      });
+
+      function renderSection(sectionId, msgs) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+        section.innerHTML = '';
+        if (msgs.length === 0) {
+          // Use CSS class instead of inline style
+          section.innerHTML = '<div class="chat-item chat-item--empty">No messages yet</div>';
+          return;
+        }
+        msgs.forEach((msg, idx) => {
+          const item = document.createElement('div');
+          item.className = 'chat-item chat-item--dynamic';
+          item.dataset.chatId = msg._id || idx;
+          item.innerHTML = `
+            <span class="chat-icon">💬</span>
+            <span class="chat-title">${msg.message.substring(0, 30)}${msg.message.length > 30 ? '…' : ''}</span>`;
+          section.appendChild(item);
+        });
+      }
+
+      renderSection('chat-section-today', today);
+      renderSection('chat-section-week', week);
+      renderSection('chat-section-month', month);
     }
 
 
@@ -14,11 +57,6 @@ class CopilotApp {
         this.setupSuggestionCards();
         this.setupSendButton();
         this.detectSystemTheme();
-    }
-
-    // method to generate unique session IDs
-    generateSessionId() {
-      return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     // Theme Management
@@ -143,49 +181,133 @@ class CopilotApp {
             });
         }
     }
-  async handleSendMessage() {
-      const chatInput = document.getElementById('chatInput');
-      const sendButton = document.getElementById('sendButton');
-      
-      if (chatInput && sendButton) {
-          const message = chatInput.value.trim();
-          
-          if (message.length > 0) {
-              // Check authentication before sending
-              if (!mongoAPI.isAuthenticated()) {
-                  this.showError('Please sign in to send messages');
-                  return;
-              }
 
-              // Add loading state
-              sendButton.classList.add('loading');
-              sendButton.style.pointerEvents = 'none';
-              
-              try {
-                  // Send to MongoDB backend
-                  const savedMessage = await mongoAPI.sendMessage(message, this.sessionId);
-                  
-                  // Clear input and update UI
-                  chatInput.value = '';
-                  this.autoResizeTextarea(chatInput);
-                  this.updateSendButtonState();
-                  
-                  // Show success message
-                  this.showSuccess(`Message saved! ID: ${savedMessage._id.substring(0, 8)}...`);
-                  
-                  // Show demo response for user feedback
-                  this.showResponseDemo(message);
-                  
-              } catch (error) {
-                  this.showError('Failed to send message: ' + error.message);
-              } finally {
-                  // Remove loading state
-                  sendButton.classList.remove('loading');
-                  sendButton.style.pointerEvents = 'auto';
-              }
-          }
+  async handleSendMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+  
+    if (chatInput && sendButton) {
+      const message = chatInput.value.trim();
+    
+    if (message.length > 0) {
+      // Add loading state
+      sendButton.classList.add('loading');
+      sendButton.style.pointerEvents = 'none';
+      
+      try {
+        const sessionData = JSON.parse(localStorage.getItem('google_auth_session'));
+        
+        // Send message to backend
+        const response = await fetch('https://your-backend-url.vercel.app/api/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionData.token
+          },
+          body: JSON.stringify({
+            message: message,
+            userId: this.currentUser.id
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          chatInput.value = '';
+          this.autoResizeTextarea(chatInput);
+          this.updateSendButtonState();
+          
+          // UPDATE SIDEBAR after successful message send
+          this.fetchUserMessages().then(messages => {
+            this.renderSidebar(messages);
+          });
+        } else {
+          console.error('Failed to send message');
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+      } finally {
+        // Remove loading state
+        sendButton.classList.remove('loading');
+        sendButton.style.pointerEvents = 'auto';
       }
+    }
   }
+}
+
+
+
+    async fetchUserMessages() {
+      const sessionData = localStorage.getItem('google_auth_session');
+      if (!sessionData) return [];
+  
+      const parsed = JSON.parse(sessionData);
+      if (!parsed.token) return [];
+
+      try {
+        // Replace with your actual deployed backend URL
+        const response = await fetch('https://your-backend-url.vercel.app/api/messages', {
+          headers: {
+            'Authorization': 'Bearer ' + parsed.token
+          }
+        });
+    
+        const data = await response.json();
+        if (data.success) {
+          return data.messages;
+        } else {
+          console.error('Failed to fetch messages:', data.message);
+          return [];
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error.message);
+        return [];
+      }
+    }
+
+
+    renderSidebar(messages) {
+      const today = [];
+      const week = [];
+      const month = [];
+      const now = new Date();
+
+      messages.forEach(msg => {
+        const msgDate = new Date(msg.timestamp);
+        const diffDays = (now - msgDate) / (1000 * 60 * 60 * 24);
+        if (diffDays < 1) {
+          today.push(msg);
+        } else if (diffDays < 7) {
+          week.push(msg);
+        } else if (diffDays < 30) {
+          month.push(msg);
+        }
+      });
+
+      function renderSection(sectionId, msgs) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+        section.innerHTML = '';
+        if (msgs.length === 0) {
+          section.innerHTML = '<div class="chat-item" style="color:#888;">No chats</div>';
+          return;
+        }
+        msgs.forEach((msg, idx) => {
+          const item = document.createElement('div');
+          item.className = 'chat-item';
+          item.dataset.chatId = msg._id || idx;
+          item.innerHTML = `
+            <span class="chat-icon">💬</span>
+            <span class="chat-title">${msg.message.substring(0, 30)}${msg.message.length > 30 ? '…' : ''}</span>`;
+          section.appendChild(item);
+        });
+      }
+
+      renderSection('chat-section-today', today);
+      renderSection('chat-section-week', week);
+      renderSection('chat-section-month', month);
+    }
+
 
     showResponseDemo(userMessage) {
         // Create a simple response indicator
@@ -302,56 +424,6 @@ class CopilotApp {
             timeout = setTimeout(later, wait);
         };
     }
-
-    // Add these methods to your CopilotApp class
-showError(message) {
-    this.showNotification(message, 'error');
-}
-
-showSuccess(message) {
-    this.showNotification(message, 'success');
-}
-
-showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : '#4444ff'};
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        font-size: 14px;
-        max-width: 300px;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-    `;
-    
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateY(0)';
-    }, 100);
-    
-    // Remove after 4 seconds
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(-10px)';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 4000);
-}
-
 }
 
 // Smooth scroll behavior for suggestion cards
@@ -538,9 +610,7 @@ class GoogleAuthManager {
       signOutButton: document.getElementById('signOutButton'),
       profileSettings: document.getElementById('profileSettings'),
       preferences: document.getElementById('preferences'),
-      alternativeSignIn: document.getElementById('alternativeSignIn'),
-      sidebarUserName: document.querySelector('.sidebar-footer .user-name'),
-      sidebarUserEmail: document.querySelector('.sidebar-footer .user-email')
+      alternativeSignIn: document.getElementById('alternativeSignIn')
     };
   }
 
@@ -701,49 +771,52 @@ class GoogleAuthManager {
    */
   async handleCredentialResponse(response) {
     try {
-        this.log('Credential response received');
-        
-        // Decode the JWT token
-        const userInfo = this.decodeJWT(response.credential);
-        
-        if (!userInfo) {
-            throw new Error('Invalid credential token');
-        }
+      this.log('Credential response received');
+      
+      // Decode the JWT token
+      const userInfo = this.decodeJWT(response.credential);
+      
+      if (!userInfo) {
+        throw new Error('Invalid credential token');
+      }
 
-        // Authenticate with your MongoDB backend
-        const user = await mongoAPI.authenticateWithGoogle({
-            id: userInfo.sub,
-            email: userInfo.email,
-            name: userInfo.name,
-            picture: userInfo.picture
-        });
+      // Create user object
+      const user = {
+        id: userInfo.sub,
+        email: userInfo.email,
+        name: userInfo.name,
+        picture: userInfo.picture,
+        given_name: userInfo.given_name,
+        family_name: userInfo.family_name,
+        email_verified: userInfo.email_verified,
+        token: response.credential
+      };
 
-        // Store user information
-        this.currentUser = user;
-        
-        // Save to localStorage for session persistence
-        this.saveUserSession(user);
-        
-        // Update UI
-        this.updateUIForSignedIn(user);
-        
-        // Close dropdown
-        this.closeDropdown();
-        
-        // Call custom sign-in callback
-        this.config.onSignIn(user);
-        
-        // Dispatch custom event for other components
-        document.dispatchEvent(new CustomEvent('userLoggedIn', { 
-            detail: { user: user } 
-        }));
-        
-        this.log('User authenticated with backend:', user);
-        
+      // Store user information
+      this.currentUser = user;
+      
+      // Save to localStorage for session persistence
+      this.saveUserSession(user);
+      
+      // Update UI
+      this.updateUIForSignedIn(user);
+
+      this.fetchUserMessages().then(messages => {
+        this.renderSidebar(messages);
+      });
+      
+      // Close dropdown
+      this.closeDropdown();
+      
+      // Call custom sign-in callback
+      this.config.onSignIn(user);
+      
+      this.log('User signed in successfully:', user);
+      
     } catch (error) {
-        this.handleError('Authentication failed', error);
+      this.handleError('Sign-in failed', error);
     }
-}
+  }
 
   /**
    * Decode JWT token
@@ -868,14 +941,6 @@ class GoogleAuthManager {
       this.elements.userEmail.textContent = user.email || '';
     }
 
-    // Update sidebar content
-    if (this.elements.sidebarUserName) {
-      this.elements.sidebarUserName.textContent = user.name || 'User';
-    }
-    if (this.elements.sidebarUserEmail) {
-      this.elements.sidebarUserEmail.textContent = user.email || 'user@example.com';
-    }
-
     // Update dropdown avatar
     if (user.picture && this.elements.dropdownUserAvatar) {
       this.elements.dropdownUserAvatar.src = user.picture;
@@ -961,44 +1026,36 @@ class GoogleAuthManager {
    */
   restoreUserSession() {
     try {
-        // Fix the typo: should be 'google_auth_session' not 'google_r_session'
-        const sessionData = localStorage.getItem('google_auth_session');
-        if (!sessionData) return;
+      // Change this line from 'google_r_session' to 'google_auth_session'
+      const sessionData = localStorage.getItem('google_auth_session');
+      if (!sessionData) return;
 
-        const parsed = JSON.parse(sessionData);
-        const sessionAge = Date.now() - parsed.timestamp;
-        
-        // Session expires after 24 hours
-        if (sessionAge > 24 * 60 * 60 * 1000) {
-            this.clearUserSession();
-            return;
-        }
-
-        if (parsed.user) {
-            this.currentUser = parsed.user;
-            this.updateUIForSignedIn(parsed.user);
-            
-            // Re-authenticate with backend to get fresh token
-            this.authenticateWithBackend(parsed.user);
-            
-            this.log('User session restored');
-        }
-    } catch (error) {
-        this.log('Failed to restore user session:', error);
+      const parsed = JSON.parse(sessionData);
+      const sessionAge = Date.now() - parsed.timestamp;
+    
+      // Session expires after 24 hours
+      if (sessionAge > 24 * 60 * 60 * 1000) {
         this.clearUserSession();
-    }
-}
+        return;
+      }
 
-async authenticateWithBackend(user) {
-    try {
-        await mongoAPI.authenticateWithGoogle(user);
+      if (parsed.user) {
+        this.currentUser = parsed.user;
+        this.updateUIForSignedIn(parsed.user);
+      
+        // ADD THIS: Fetch and render chat history after session restore
+        this.fetchUserMessages().then(messages => {
+          this.renderSidebar(messages);
+        });
+      
+        console.log('User session restored');
+      }
     } catch (error) {
-        this.log('Backend re-authentication failed:', error);
-        // If backend auth fails, clear the session
-        this.clearUserSession();
-        this.updateUIForSignedOut();
+      console.log('Failed to restore user session:', error);
+      this.clearUserSession();
     }
-}
+  }
+
 
   /**
    * Clear user session from localStorage
@@ -1009,6 +1066,16 @@ async authenticateWithBackend(user) {
     } catch (error) {
       this.log('Failed to clear user session:', error);
     }
+
+    const todaySection = document.getElementById('chat-section-today');
+    const weekSection = document.getElementById('chat-section-week');
+    const monthSection = document.getElementById('chat-section-month');
+    if (todaySection) todaySection.innerHTML = '';
+    if (weekSection) weekSection.innerHTML = '';
+    if (monthSection) monthSection.innerHTML = '';
+
+    //clear current user
+    this.currentUser = null;
   }
 
   /**
@@ -1189,154 +1256,3 @@ document.addEventListener('keydown', (e) => {
 if (window.innerWidth < 768) {
   hideSidebar();
 }
-
-// Removed the problematic existing custom event code and replaced with this:
-document.addEventListener('DOMContentLoaded', () => {
-    const app = new CopilotApp();
-    addSmoothInteractions();
-    setupAccessibility();
-    
-    // Initialize Google Auth with MongoDB integration
-    const googleAuth = new GoogleAuthManager({
-        clientId: '840850164307-m4lks13qq8ffu6sadbhu05233upog1ni.apps.googleusercontent.com',
-        debugMode: true,
-        onSignIn: (user) => {
-            console.log('User signed in:', user);
-            // Update any other UI components that need user info
-        },
-        onSignOut: () => {
-            console.log('User signed out');
-            mongoAPI.signOut();
-        },
-        onError: (error) => {
-            console.error('Auth error:', error);
-            app.showError('Authentication failed: ' + error.message);
-        }
-    });
-    
-    // Add loading animation for the page
-    document.body.style.opacity = '0';
-    document.body.style.transform = 'translateY(20px)';
-    
-    setTimeout(() => {
-        document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        document.body.style.opacity = '1';
-        document.body.style.transform = 'translateY(0)';
-    }, 100);
-});
-
-
-
-
-// MongoDB API Client - Add this after your existing classes
-class MongoDBChatAPI {
-    constructor() {
-        this.baseURL = 'http://localhost:3001/api';
-        this.token = localStorage.getItem('chat_auth_token');
-        this.currentUser = null;
-    }
-
-    setAuthToken(token) {
-        this.token = token;
-        localStorage.setItem('chat_auth_token', token);
-    }
-
-    isAuthenticated() {
-        return !!this.token;
-    }
-
-    async authenticateWithGoogle(googleUser) {
-        try {
-            const response = await fetch(`${this.baseURL}/auth/google`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    googleId: googleUser.id,
-                    email: googleUser.email,
-                    name: googleUser.name,
-                    picture: googleUser.picture
-                })
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                this.setAuthToken(data.token);
-                this.currentUser = data.user;
-                return data.user;
-            } else {
-                throw new Error(data.message || 'Authentication failed');
-            }
-        } catch (error) {
-            console.error('Authentication error:', error);
-            throw error;
-        }
-    }
-
-    async sendMessage(message, sessionId = null) {
-        if (!this.isAuthenticated()) {
-            throw new Error('Not authenticated');
-        }
-
-        try {
-            const response = await fetch(`${this.baseURL}/messages`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.token}`
-                },
-                body: JSON.stringify({
-                    message,
-                    sessionId
-                })
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                return data.message;
-            } else {
-                throw new Error(data.message || 'Failed to send message');
-            }
-        } catch (error) {
-            console.error('Send message error:', error);
-            throw error;
-        }
-    }
-
-    async getMessages() {
-        if (!this.isAuthenticated()) {
-            throw new Error('Not authenticated');
-        }
-
-        try {
-            const response = await fetch(`${this.baseURL}/messages`, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`
-                }
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                return data.messages;
-            } else {
-                throw new Error(data.message || 'Failed to fetch messages');
-            }
-        } catch (error) {
-            console.error('Fetch messages error:', error);
-            throw error;
-        }
-    }
-
-    signOut() {
-        this.token = null;
-        this.currentUser = null;
-        localStorage.removeItem('chat_auth_token');
-    }
-}
-
-// Initialize the API client
-const mongoAPI = new MongoDBChatAPI();
